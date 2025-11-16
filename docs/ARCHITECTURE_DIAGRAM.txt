@@ -1,0 +1,278 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          🎯 PeerView Architecture                            │
+│                        Flask Modular Structure                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                                  run.py
+                                    │
+                                    ▼
+                           ┌─────────────────┐
+                           │  create_app()   │
+                           │   (Factory)     │
+                           └─────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+            ┌───────────┐   ┌───────────┐   ┌───────────┐
+            │   CORS    │   │  Configs  │   │  Services │
+            │  Setup    │   │  Loading  │   │   Init    │
+            └───────────┘   └───────────┘   └───────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+            ┌─────────────────────────────────────────────┐
+            │           Blueprint Registration             │
+            └─────────────────────────────────────────────┘
+                    │
+        ┌───────────┼───────────┬───────────┬───────────┐
+        ▼           ▼           ▼           ▼           ▼
+    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+    │  main  │ │  auth  │ │student │ │teacher │ │ admin  │
+    │   bp   │ │   bp   │ │   bp   │ │   bp   │ │   bp   │
+    └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+        │           │           │           │           │
+        └───────────┴───────────┴───────────┴───────────┘
+                            │
+                ┌───────────┴───────────┐
+                ▼                       ▼
+        ┌──────────────┐       ┌──────────────┐
+        │ Middleware   │       │   Models     │
+        ├──────────────┤       ├──────────────┤
+        │ @token_req   │       │ UserModel    │
+        │ @role_req    │       │ QuestionM... │
+        └──────────────┘       └──────────────┘
+                │
+        ┌───────┴───────┐
+        ▼               ▼
+┌──────────────┐ ┌──────────────┐
+│  Services    │ │   Utils      │
+├──────────────┤ ├──────────────┤
+│ CosmosDB     │ │ JWT Helper   │
+│ Blob Storage │ │ Validators   │
+│              │ │ Responses    │
+└──────────────┘ └──────────────┘
+        │
+        ▼
+┌──────────────┐
+│ Azure Cloud  │
+├──────────────┤
+│ Cosmos DB    │
+│ Blob Storage │
+└──────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            📂 File Structure
+═══════════════════════════════════════════════════════════════════════════════
+
+run.py ──────────────────────┐
+                              │  Entry point
+                              │  Creates app
+                              │  Starts server
+                              │
+app/                          │
+ │                            │
+ ├── __init__.py ────────────┘  Application factory
+ │                               Registers blueprints
+ │                               Configures CORS
+ │                               Error handlers
+ │
+ ├── config.py ─────────────────  Environment configs
+ │                               Development
+ │                               Production
+ │                               Testing
+ │
+ ├── routes/ ───────────────────  Blueprints (Controllers)
+ │   ├── main.py                  GET /
+ │   ├── auth.py                  POST /auth/*
+ │   ├── student.py               GET/POST /student/*
+ │   ├── teacher.py               GET/POST/DELETE /teacher/*
+ │   └── admin.py                 GET/POST/DELETE /admin/*
+ │
+ ├── models/ ───────────────────  Data schemas
+ │   ├── user_model.py            User validation
+ │   └── question_model.py        Question/Answer schemas
+ │
+ ├── services/ ─────────────────  Business logic
+ │   ├── cosmos_service.py        Database CRUD
+ │   └── blob_service.py          File uploads
+ │
+ └── utils/ ────────────────────  Helper functions
+     ├── auth_middleware.py      Decorators
+     ├── jwt_helper.py           Tokens
+     ├── password_helper.py      Hashing
+     ├── validators.py           Input validation
+     ├── response_handler.py     Standard responses
+     └── rate_limiter.py         Rate limiting
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                          🔄 Request Flow
+═══════════════════════════════════════════════════════════════════════════════
+
+  Client Request
+       │
+       ▼
+  ┌─────────┐
+  │  CORS   │  Check origin, headers
+  └─────────┘
+       │
+       ▼
+  ┌─────────┐
+  │Blueprint│  Route to correct handler
+  └─────────┘
+       │
+       ▼
+  ┌─────────┐
+  │Middleware│ @token_required
+  └─────────┘  @role_required
+       │
+       ▼
+  ┌─────────┐
+  │Validators│ Check input data
+  └─────────┘
+       │
+       ▼
+  ┌─────────┐
+  │ Service │  Business logic
+  └─────────┘  Database operations
+       │
+       ▼
+  ┌─────────┐
+  │Response │  Standard format
+  └─────────┘  Success/Error
+       │
+       ▼
+  Client Response
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        🎯 Blueprint Organization
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ main.py (/)                                                              │
+├──────────────────────────────────────────────────────────────────────────┤
+│ GET  /          → Health check & API info                                │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ auth.py (/auth)                                                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│ POST /register  → User registration                                      │
+│ POST /login     → User authentication                                    │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ student.py (/student)                                                    │
+├──────────────────────────────────────────────────────────────────────────┤
+│ POST /question       → Post new question (rate limited)                  │
+│ GET  /questions      → Get all questions (public)                        │
+│ GET  /question/<id>  → Get specific question                             │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ teacher.py (/teacher) [requires teacher/admin role]                     │
+├──────────────────────────────────────────────────────────────────────────┤
+│ GET    /questions         → View all questions                           │
+│ POST   /answer/<id>       → Answer question (rate limited)               │
+│ DELETE /answer/<id>       → Delete own answer                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ admin.py (/admin) [requires admin role]                                 │
+├──────────────────────────────────────────────────────────────────────────┤
+│ GET    /all                → Get all data & statistics                   │
+│ DELETE /question/<id>      → Delete any question                         │
+│ POST   /create-teacher     → Create teacher account                      │
+│ POST   /create-student     → Create student account                      │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                          🛡️ Security Layers
+═══════════════════════════════════════════════════════════════════════════════
+
+    Request
+       │
+       ▼
+  ┌─────────────────────┐
+  │ CORS                │  Origin validation
+  └─────────────────────┘
+       │
+       ▼
+  ┌─────────────────────┐
+  │ JWT Authentication  │  Token verification
+  │ @token_required     │
+  └─────────────────────┘
+       │
+       ▼
+  ┌─────────────────────┐
+  │ RBAC                │  Role checking
+  │ @role_required      │
+  └─────────────────────┘
+       │
+       ▼
+  ┌─────────────────────┐
+  │ Rate Limiting       │  Prevent abuse
+  └─────────────────────┘
+       │
+       ▼
+  ┌─────────────────────┐
+  │ Input Validation    │  Data validation
+  └─────────────────────┘
+       │
+       ▼
+    Process Request
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        ✨ Key Improvements
+═══════════════════════════════════════════════════════════════════════════════
+
+Before                          After
+─────────────────────────────────────────────────────────────────────────
+Monolithic app.py        →      Application factory pattern
+Flat structure           →      Hierarchical organization  
+Global app instance      →      Context-aware app creation
+Mixed concerns           →      Separation of concerns
+Hard to test             →      Easy to test
+Difficult to scale       →      Highly scalable
+Unclear imports          →      Explicit app.* imports
+Manual registration      →      Automatic blueprint loading
+
+
+═══════════════════════════════════════════════════════════════════════════════
+              📊 Comparison: Old vs New
+═══════════════════════════════════════════════════════════════════════════════
+
+Aspect              Old Structure           New Structure
+─────────────────────────────────────────────────────────────────────────
+Entry Point         app.py                  run.py
+App Creation        Direct                  Factory pattern
+Routes              controllers/            app/routes/
+Organization        Flat                    Package-based
+Config Management   Single file             Environment classes
+Testing             Difficult               Easy
+Scalability         Limited                 Excellent
+Maintainability     Hard                    Easy
+Industry Standard   No                      Yes
+Deployment Ready    Basic                   Production-ready
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        🚀 Status: COMPLETE
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Application factory implemented
+✅ Blueprints organized in app/routes/
+✅ All imports updated to app.* pattern
+✅ Environment-based configurations
+✅ Clean entry point (run.py)
+✅ Professional structure
+✅ Server running successfully
+✅ All 13 endpoints active
+✅ Documentation updated
+
+Server: http://127.0.0.1:5000
+Status: ✅ RUNNING

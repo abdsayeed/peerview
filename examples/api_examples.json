@@ -1,0 +1,42 @@
+{
+  "register_student": {
+    "email": "student@example.com",
+    "password": "Student123",
+    "role": "student"
+  },
+  "register_teacher": {
+    "email": "teacher@example.com",
+    "password": "Teacher123",
+    "role": "teacher"
+  },
+  "register_admin": {
+    "email": "admin@example.com",
+    "password": "Admin123",
+    "role": "admin"
+  },
+  "login": {
+    "email": "student@example.com",
+    "password": "Student123"
+  },
+  "post_question": {
+    "title": "How to implement binary search in Python?",
+    "moduleCode": "CS101",
+    "questionId": "q-001",
+    "description": "I need help understanding the implementation of binary search algorithm"
+  },
+  "post_answer": {
+    "answerText": "Binary search works by repeatedly dividing the search interval in half. Here's a step-by-step explanation...",
+    "metadata": {
+      "references": ["CLRS Chapter 2", "Introduction to Algorithms"],
+      "difficulty": "intermediate"
+    }
+  },
+  "create_teacher": {
+    "email": "newteacher@example.com",
+    "password": "NewTeacher123"
+  },
+  "create_student": {
+    "email": "newstudent@example.com",
+    "password": "NewStudent123"
+  }
+}

@@ -1,0 +1,561 @@
+{
+	"info": {
+		"_postman_id": "peerview-backend-api",
+		"name": "PeerView Backend API",
+		"description": "Complete API collection for PeerView Backend with JWT authentication, student, teacher, and admin endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "question_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "answer_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/",
+					"host": ["{{base_url}}"],
+					"path": [""]
+				},
+				"description": "Check if the API is running and view all available endpoints"
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_token', jsonData.data.token);",
+									"    pm.environment.set('admin_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@peerview.com\",\n    \"password\": \"Admin123\",\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new admin user. Token is automatically saved to collection variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Register Teacher",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('teacher_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"teacher@peerview.com\",\n    \"password\": \"Teacher123\",\n    \"role\": \"teacher\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new teacher user"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('student_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"student@peerview.com\",\n    \"password\": \"Student123\",\n    \"role\": \"student\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new student user"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"student@peerview.com\",\n    \"password\": \"Student123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login with existing credentials. Token is automatically saved."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student APIs",
+			"item": [
+				{
+					"name": "Post Question (JSON)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('question_id', jsonData.data.questionId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"How to implement binary search in Python?\",\n    \"moduleCode\": \"CS101\",\n    \"questionId\": \"q-001\",\n    \"description\": \"I need help understanding the implementation of binary search algorithm. Can someone explain the logic?\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/student/question",
+							"host": ["{{base_url}}"],
+							"path": ["student", "question"]
+						},
+						"description": "Post a question without media. Requires student role."
+					},
+					"response": []
+				},
+				{
+					"name": "Post Question with Media",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('question_id', jsonData.data.questionId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Understanding Sorting Algorithms",
+									"type": "text"
+								},
+								{
+									"key": "moduleCode",
+									"value": "CS102",
+									"type": "text"
+								},
+								{
+									"key": "questionId",
+									"value": "q-002",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Can someone explain quick sort vs merge sort with visual examples?",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Select an image or video file"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/student/question",
+							"host": ["{{base_url}}"],
+							"path": ["student", "question"]
+						},
+						"description": "Post a question with media file (image or video)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Questions",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/student/questions",
+							"host": ["{{base_url}}"],
+							"path": ["student", "questions"]
+						},
+						"description": "Get all questions. Public endpoint, no authentication required."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Questions by Module",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/student/questions?moduleCode=CS101",
+							"host": ["{{base_url}}"],
+							"path": ["student", "questions"],
+							"query": [
+								{
+									"key": "moduleCode",
+									"value": "CS101"
+								}
+							]
+						},
+						"description": "Filter questions by module code"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Question by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/student/question/{{question_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["student", "question", "{{question_id}}"]
+						},
+						"description": "Get a specific question with all answers"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Teacher APIs",
+			"item": [
+				{
+					"name": "Get Questions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teacher/questions",
+							"host": ["{{base_url}}"],
+							"path": ["teacher", "questions"]
+						},
+						"description": "Get all questions. Requires teacher or admin role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Questions by Module",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teacher/questions?moduleCode=CS101",
+							"host": ["{{base_url}}"],
+							"path": ["teacher", "questions"],
+							"query": [
+								{
+									"key": "moduleCode",
+									"value": "CS101"
+								}
+							]
+						},
+						"description": "Filter questions by module code"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Answer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data.answers && jsonData.data.answers.length > 0) {",
+									"        var lastAnswer = jsonData.data.answers[jsonData.data.answers.length - 1];",
+									"        pm.collectionVariables.set('answer_id', lastAnswer.answerId);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"answerText\": \"Binary search works by repeatedly dividing the search interval in half. Here's a step-by-step explanation:\\n\\n1. Start with the middle element\\n2. If the target equals the middle, return the position\\n3. If target is less than middle, search the left half\\n4. If target is greater than middle, search the right half\\n5. Repeat until found or interval is empty\\n\\nTime complexity: O(log n)\",\n    \"metadata\": {\n        \"references\": [\"Introduction to Algorithms - CLRS\", \"Python Documentation\"],\n        \"difficulty\": \"intermediate\",\n        \"estimatedReadTime\": \"5 minutes\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/teacher/answer/{{question_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["teacher", "answer", "{{question_id}}"]
+						},
+						"description": "Add an answer to a question. Requires teacher or admin role."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Answer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teacher/answer/{{answer_id}}?questionId={{question_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["teacher", "answer", "{{answer_id}}"],
+							"query": [
+								{
+									"key": "questionId",
+									"value": "{{question_id}}"
+								}
+							]
+						},
+						"description": "Delete your own answer. Teachers can only delete their own answers, admins can delete any."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin APIs",
+			"item": [
+				{
+					"name": "Get All Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/all",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "all"]
+						},
+						"description": "Get all questions, users, and statistics. Requires admin role."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Question",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/question/{{question_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "question", "{{question_id}}"]
+						},
+						"description": "Delete any question. Requires admin role."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Teacher Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newteacher@peerview.com\",\n    \"password\": \"NewTeacher123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/create-teacher",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "create-teacher"]
+						},
+						"description": "Create a new teacher account. Requires admin role."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Student Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newstudent@peerview.com\",\n    \"password\": \"NewStudent123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/create-student",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "create-student"]
+						},
+						"description": "Create a new student account. Requires admin role."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

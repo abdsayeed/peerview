@@ -1,0 +1,9 @@
+version: 0
+os: linux
+files:
+  - source: /
+    destination: /home/site/wwwroot
+hooks:
+  PostDeployment:
+    - name: Install dependencies
+      action: pip install -r requirements.txt
