@@ -50,7 +50,7 @@ logic_app_service = LogicAppService()
 # HEALTH CHECK
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({'status': 'healthy', 'service': 'PeerView API'}), 200
+    return jsonify({'status': 'healthy', 'service': 'PeerView API', 'version': '1.0'}), 200
 
 # AUTHENTICATION ENDPOINTS
 @app.route('/v1/auth/register', methods=['POST'])
