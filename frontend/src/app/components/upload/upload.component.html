@@ -1,0 +1,274 @@
+<div class="upload-container">
+  <div class="upload-header">
+    <div class="header-content">
+      <h1>Ask a Question</h1>
+      <p class="header-subtitle">Share your question with multimedia content to get help from instructors and peers</p>
+    </div>
+    <div class="progress-indicator">
+      <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <span>Details</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-number">2</div>
+        <span>Media</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep >= 3">
+        <div class="step-number">3</div>
+        <span>Submit</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="upload-form card">
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit()" #questionForm="ngForm">
+        <!-- Step 1: Question Details -->
+        <div class="form-section" [class.active]="currentStep === 1">
+          <h3 class="section-title">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+            Question Details
+          </h3>
+          
+          <div class="form-group">
+            <label class="form-label">Your User ID</label>
+            <input 
+              [(ngModel)]="question.userId" 
+              name="userId"
+              type="text" 
+              class="form-control" 
+              placeholder="Enter your student or instructor ID"
+              required>
+            <small class="form-text">This helps identify you as the question author</small>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Question Title</label>
+            <input 
+              [(ngModel)]="question.title" 
+              name="title"
+              type="text" 
+              class="form-control" 
+              placeholder="Enter a clear, descriptive title"
+              maxlength="100"
+              required>
+            <small class="form-text">{{ question.title.length }}/100 characters</small>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Detailed Description</label>
+            <textarea 
+              [(ngModel)]="question.caption" 
+              name="caption"
+              class="form-control" 
+              rows="5" 
+              placeholder="Describe your question in detail. What specific help do you need?"
+              maxlength="1000"
+              required>
+            </textarea>
+            <small class="form-text">{{ question.caption.length }}/1000 characters</small>
+          </div>
+          
+          <div class="step-actions">
+            <button type="button" class="btn btn-primary" (click)="nextStep()" 
+                    [disabled]="!question.userId || !question.title || !question.caption">
+              Next: Choose Media Type
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Media Upload -->
+        <div class="form-section" [class.active]="currentStep === 2">
+          <h3 class="section-title">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+            </svg>
+            Upload Media
+          </h3>
+          
+          <div class="form-group">
+            <label class="form-label">Media Type</label>
+            <div class="media-type-selector">
+              <label class="media-option" [class.selected]="question.mediaType === 'image'">
+                <input type="radio" [(ngModel)]="question.mediaType" name="mediaType" value="image" required>
+                <div class="option-content">
+                  <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                  </svg>
+                  <span>Image</span>
+                  <small>JPG, PNG, GIF</small>
+                </div>
+              </label>
+              
+              <label class="media-option" [class.selected]="question.mediaType === 'video'">
+                <input type="radio" [(ngModel)]="question.mediaType" name="mediaType" value="video" required>
+                <div class="option-content">
+                  <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                  </svg>
+                  <span>Video</span>
+                  <small>MP4, WebM, AVI</small>
+                </div>
+              </label>
+              
+              <label class="media-option" [class.selected]="question.mediaType === 'audio'">
+                <input type="radio" [(ngModel)]="question.mediaType" name="mediaType" value="audio" required>
+                <div class="option-content">
+                  <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                  </svg>
+                  <span>Audio</span>
+                  <small>MP3, WAV, OGG</small>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Choose File</label>
+            <div class="file-upload-area" 
+                 [class.has-file]="selectedFile"
+                 (dragover)="onDragOver($event)"
+                 (dragleave)="onDragLeave($event)"
+                 (drop)="onDrop($event)">
+              <input 
+                type="file" 
+                #fileInput
+                class="file-input" 
+                (change)="onFileSelected($event)"
+                [accept]="getAcceptedFileTypes()"
+                required>
+              
+              <div *ngIf="!selectedFile" class="upload-prompt">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                <p class="upload-text">Drag and drop your file here, or <button type="button" class="upload-link" (click)="fileInput.click()">browse</button></p>
+                <small class="upload-hint">Maximum file size: 50MB</small>
+              </div>
+              
+              <div *ngIf="selectedFile" class="file-info">
+                <svg class="file-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                <div class="file-details">
+                  <span class="file-name">{{ selectedFile.name }}</span>
+                  <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+                </div>
+                <button type="button" class="remove-file" (click)="removeFile()">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Preview Section -->
+          <div *ngIf="selectedFile && previewUrl" class="preview-section">
+            <h4 class="preview-title">Preview</h4>
+            <div class="media-preview">
+              <img *ngIf="question.mediaType === 'image'" 
+                   [src]="previewUrl" 
+                   alt="Preview" 
+                   class="preview-media">
+              <video *ngIf="question.mediaType === 'video'" 
+                     [src]="previewUrl" 
+                     controls 
+                     class="preview-media">
+              </video>
+              <audio *ngIf="question.mediaType === 'audio'" 
+                     [src]="previewUrl" 
+                     controls 
+                     class="preview-media">
+              </audio>
+            </div>
+          </div>
+          
+          <div class="step-actions">
+            <button type="button" class="btn btn-secondary" (click)="previousStep()">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+              </svg>
+              Back
+            </button>
+            <button type="button" class="btn btn-primary" (click)="nextStep()" 
+                    [disabled]="!selectedFile">
+              Next: Review & Submit
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 3: Review & Submit -->
+        <div class="form-section" [class.active]="currentStep === 3">
+          <h3 class="section-title">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            Review & Submit
+          </h3>
+          
+          <div class="review-section">
+            <div class="review-item">
+              <label>User ID:</label>
+              <span>{{ question.userId }}</span>
+            </div>
+            <div class="review-item">
+              <label>Title:</label>
+              <span>{{ question.title }}</span>
+            </div>
+            <div class="review-item">
+              <label>Description:</label>
+              <p>{{ question.caption }}</p>
+            </div>
+            <div class="review-item">
+              <label>Media Type:</label>
+              <span class="media-type-badge">{{ question.mediaType | titlecase }}</span>
+            </div>
+            <div class="review-item" *ngIf="selectedFile">
+              <label>File:</label>
+              <span>{{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})</span>
+            </div>
+          </div>
+          
+          <div *ngIf="error" class="error">
+            <svg class="error-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            {{ error }}
+          </div>
+          
+          <div class="step-actions">
+            <button type="button" class="btn btn-secondary" (click)="previousStep()">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+              </svg>
+              Back
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary btn-lg" 
+              [disabled]="!questionForm.form.valid || uploading">
+              <svg *ngIf="!uploading" class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+              <div *ngIf="uploading" class="loading-spinner"></div>
+              <span *ngIf="uploading">Publishing Question...</span>
+              <span *ngIf="!uploading">Publish Question</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

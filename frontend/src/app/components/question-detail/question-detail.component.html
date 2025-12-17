@@ -1,0 +1,133 @@
+<div class="question-detail-container">
+  <div *ngIf="loading" class="loading">
+    Loading question...
+  </div>
+  
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+  
+  <div *ngIf="question && !loading" class="question-detail">
+    <!-- Question Section -->
+    <div class="question-section card">
+      <div class="card-header">
+        <div class="question-header">
+          <h1>{{ question.title }}</h1>
+          <div class="question-meta">
+            <span class="user-id">Asked by: {{ question.userId }}</span>
+            <span class="timestamp">{{ formatDate(question.timestamp) }}</span>
+            <span class="badge" [ngClass]="question.status === 'answered' ? 'badge-success' : 'badge-warning'">
+              {{ question.status === 'answered' ? 'Answered' : 'Pending' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <p class="question-caption">{{ question.caption }}</p>
+        
+        <div class="media-container" *ngIf="question.mediaUrl">
+          <img *ngIf="question.mediaType === 'image'" 
+               [src]="question.mediaUrl" 
+               [alt]="question.title"
+               class="media-content">
+          <video *ngIf="question.mediaType === 'video'" 
+                 [src]="question.mediaUrl" 
+                 controls 
+                 class="media-content">
+            Your browser does not support the video tag.
+          </video>
+          <audio *ngIf="question.mediaType === 'audio'" 
+                 [src]="question.mediaUrl" 
+                 controls 
+                 class="media-content">
+            Your browser does not support the audio tag.
+          </audio>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Answers Section -->
+    <div class="answers-section">
+      <div class="answers-header">
+        <h2>Answers ({{ question.answers.length }})</h2>
+        <button class="btn btn-primary" (click)="showAnswerForm = !showAnswerForm">
+          {{ showAnswerForm ? 'Cancel' : 'Add Answer' }}
+        </button>
+      </div>
+      
+      <!-- Answer Form -->
+      <div *ngIf="showAnswerForm" class="answer-form card">
+        <div class="card-body">
+          <h3>Your Answer</h3>
+          <form (ngSubmit)="submitAnswer()" #answerForm="ngForm">
+            <div class="form-group">
+              <label class="form-label">Your User ID *</label>
+              <input 
+                [(ngModel)]="newAnswer.userId" 
+                name="userId"
+                type="text" 
+                class="form-control" 
+                placeholder="Enter your instructor/user ID"
+                required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Answer *</label>
+              <textarea 
+                [(ngModel)]="newAnswer.textResponse" 
+                name="textResponse"
+                class="form-control" 
+                rows="5" 
+                placeholder="Provide a detailed answer..."
+                required>
+              </textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="!answerForm.form.valid || submittingAnswer">
+                <span *ngIf="submittingAnswer">Submitting...</span>
+                <span *ngIf="!submittingAnswer">Submit Answer</span>
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="cancelAnswer()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Existing Answers -->
+      <div class="answers-list">
+        <div *ngFor="let answer of question.answers" class="answer-item card">
+          <div class="card-body">
+            <div class="answer-header">
+              <span class="answer-author">{{ answer.userId }}</span>
+              <span class="answer-timestamp">{{ formatDate(answer.timestamp) }}</span>
+            </div>
+            <p class="answer-text">{{ answer.textResponse }}</p>
+            <div *ngIf="answer.mediaUrl" class="answer-media">
+              <img [src]="answer.mediaUrl" alt="Answer media" class="answer-media-content">
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="question.answers.length === 0" class="no-answers">
+          <p>No answers yet. Be the first to help!</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="navigation-actions">
+      <button class="btn btn-secondary" (click)="goBack()">
+        ← Back to Feed
+      </button>
+    </div>
+  </div>
+</div>

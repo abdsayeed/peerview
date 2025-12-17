@@ -1,0 +1,220 @@
+<div class="feed-container">
+  <div class="feed-header">
+    <div class="header-content">
+      <h1>Question Feed</h1>
+      <p class="header-subtitle">Discover and answer questions from your peers</p>
+    </div>
+    <a routerLink="/upload" class="btn btn-primary btn-lg">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+      </svg>
+      Ask a Question
+    </a>
+  </div>
+  
+  <div *ngIf="loading" class="loading">
+    Loading questions...
+  </div>
+  
+  <div *ngIf="error" class="error">
+    <svg class="error-icon" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    </svg>
+    {{ error }}
+  </div>
+  
+  <div class="questions-list">
+    <div *ngFor="let question of questions; trackBy: trackByQuestionId" class="question-card card">
+      <div class="card-header">
+        <div class="question-meta">
+          <div class="question-title-row">
+            <h3 class="question-title">{{ question.title }}</h3>
+            <div class="question-header-actions">
+              <span class="badge" [ngClass]="question.status === 'answered' ? 'badge-success' : 'badge-warning'">
+                {{ question.status === 'answered' ? 'Answered' : 'Pending' }}
+              </span>
+              <div class="question-menu" *ngIf="canEditQuestion(question)">
+                <button class="menu-trigger" (click)="toggleMenu(question.id)">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                  </svg>
+                </button>
+                <div class="menu-dropdown" *ngIf="showMenuFor === question.id">
+                  <button class="menu-item" (click)="showEditForm(question)">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                    Edit
+                  </button>
+                  <button class="menu-item delete" (click)="deleteQuestion(question.id)">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="meta-info">
+            <div class="user-info">
+              <svg class="user-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+              <span class="user-id">{{ question.userId }}</span>
+            </div>
+            <div class="timestamp-info">
+              <svg class="time-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
+              <span class="timestamp">{{ formatDate(question.timestamp) }}</span>
+            </div>
+            <div class="media-type-info">
+              <svg class="media-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path *ngIf="question.mediaType === 'image'" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                <path *ngIf="question.mediaType === 'video'" d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                <path *ngIf="question.mediaType === 'audio'" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+              <span class="media-type">{{ question.mediaType | titlecase }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <p class="question-caption">{{ question.caption }}</p>
+        
+        <div class="media-container" *ngIf="question.mediaUrl">
+          <img *ngIf="question.mediaType === 'image'" 
+               [src]="question.mediaUrl" 
+               [alt]="question.title"
+               class="media-content"
+               (load)="onMediaLoad($event)"
+               (error)="onMediaError($event)">
+          <video *ngIf="question.mediaType === 'video'" 
+                 [src]="question.mediaUrl" 
+                 controls 
+                 preload="metadata"
+                 class="media-content"
+                 (error)="onMediaError($event)">
+            Your browser does not support the video tag.
+          </video>
+          <audio *ngIf="question.mediaType === 'audio'" 
+                 [src]="question.mediaUrl" 
+                 controls 
+                 preload="metadata"
+                 class="media-content"
+                 (error)="onMediaError($event)">
+            Your browser does not support the audio tag.
+          </audio>
+        </div>
+        
+        <div class="question-stats">
+          <div class="stat-item">
+            <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 6h-2l-1-2H6L5 6H3c-.55 0-1 .45-1 1v11c0 .55.45 1 1 1h18c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1z"/>
+            </svg>
+            <span>{{ question.answers.length }} {{ question.answers.length === 1 ? 'Answer' : 'Answers' }}</span>
+          </div>
+        </div>
+        
+        <div class="question-actions">
+          <a [routerLink]="['/question', question.id]" class="btn btn-outline">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+            View Details
+          </a>
+          <button class="btn btn-primary" (click)="showAnswerForm(question.id)">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+            Add Answer
+          </button>
+        </div>
+        
+        <!-- Edit Question Form -->
+        <div *ngIf="showEditFormFor === question.id" class="edit-form">
+          <h4 class="form-title">Edit Question</h4>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input 
+              [(ngModel)]="editForm.title" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter question title">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea 
+              [(ngModel)]="editForm.caption" 
+              class="form-control" 
+              rows="4" 
+              placeholder="Describe your question in detail...">
+            </textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" 
+                    (click)="updateQuestion(question.id)"
+                    [disabled]="!editForm.title || !editForm.caption">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              Save Changes
+            </button>
+            <button class="btn btn-secondary" (click)="cancelEdit()">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Answer Form -->
+        <div *ngIf="showAnswerFormFor === question.id" class="answer-form">
+          <h4 class="form-title">Quick Answer</h4>
+          <div class="form-group">
+            <label class="form-label">Your User ID</label>
+            <input 
+              [(ngModel)]="newAnswer.userId" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter your instructor/user ID">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Answer</label>
+            <textarea 
+              [(ngModel)]="newAnswer.textResponse" 
+              class="form-control" 
+              rows="4" 
+              placeholder="Provide a helpful answer to this question...">
+            </textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" 
+                    (click)="submitAnswer(question.id)"
+                    [disabled]="!newAnswer.userId || !newAnswer.textResponse">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+              Submit Answer
+            </button>
+            <button class="btn btn-secondary" (click)="cancelAnswer()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="questions.length === 0 && !loading && !error" class="no-questions">
+    <div class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+      </svg>
+      <h3>No questions yet</h3>
+      <p>Be the first to ask a question and start the conversation!</p>
+      <a routerLink="/upload" class="btn btn-primary">Ask the First Question</a>
+    </div>
+  </div>
+</div>
