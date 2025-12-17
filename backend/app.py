@@ -19,8 +19,8 @@ from opencensus.trace.samplers import ProbabilitySampler
 app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:4200",  # Development
-    "https://loquacious-macaron-75aac1.netlify.app",  # Old Netlify URL
-    "https://peer-view.netlify.app"  # New Netlify URL
+    "https://peer-view.netlify.app",  # Netlify frontend
+    "https://loquacious-macaron-75aac1.netlify.app"  # Old Netlify URL
 ])
 
 # Configure Azure Application Insights
