@@ -17,7 +17,10 @@ from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.trace.samplers import ProbabilitySampler
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:4200",  # Development
+    "https://loquacious-macaron-75aac1.netlify.app"  # Production
+])
 
 # Configure Azure Application Insights
 INSTRUMENTATION_KEY = os.getenv('APPINSIGHTS_INSTRUMENTATION_KEY')
@@ -499,4 +502,5 @@ def debug_media_urls():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    # For local development
     app.run(debug=True, host='0.0.0.0', port=5001)
