@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Azure App Service startup script for PeerView backend
+Updated: 2025-12-18
 """
 import os
 import sys
