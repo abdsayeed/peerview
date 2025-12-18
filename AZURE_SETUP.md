@@ -10,7 +10,7 @@
 ### Set Startup Command in Azure Portal
 
 1. Go to [Azure Portal](https://portal.azure.com)
-2. Navigate to your App Service: `peerview-backend-cpeff0b9eqhdanar`
+2. Navigate to your App Service: `peerview-backend-we` (France Central)
 3. Go to **Configuration** → **General settings**
 4. Set **Startup Command** to:
    ```bash
@@ -18,7 +18,7 @@
    ```
 5. Click **Save**
 6. Wait 30-60 seconds for the app to restart
-7. Test: https://peerview-backend.azurewebsites.net/health
+7. Test: https://peerview-backend-we.azurewebsites.net/health
 
 ## Verify Configuration
 
@@ -56,14 +56,15 @@ Once running, test these:
 - Questions: `GET /v1/questions`
 
 ## Deployment URL
-https://peerview-backend.azurewebsites.net
+**Production:** https://peerview-backend-we.azurewebsites.net
+**Region:** France Central
 
 ## Troubleshooting
 
 ### Wrong URL?
-If you see a URL like `peerview-backend-cpeff0b9eqhdanar.switzerlandnorth-01.azurewebsites.net`, that's a deployment slot URL.
+If you see a URL with random characters, that's a deployment slot URL.
 
-Your actual production URL is: **https://peerview-backend.azurewebsites.net**
+Your actual production URL is: **https://peerview-backend-we.azurewebsites.net**
 
 ### Check Deployment Slots
 Azure Portal → App Service → Deployment slots
