@@ -5,7 +5,6 @@ azure-storage-blob==12.19.0
 python-dotenv==1.0.0
 pyjwt==2.8.0
 bcrypt==4.1.2
-uuid
 requests==2.31.0
 opencensus-ext-azure==1.1.13
 opencensus-ext-flask==0.8.0
