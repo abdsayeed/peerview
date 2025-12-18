@@ -2,12 +2,10 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - peerview-backend-we
+name: Build and deploy Python app to Azure Web App - peerview-backend-we (DISABLED)
 
 on:
-  push:
-    branches:
-      - main
+  # Disabled - using azure-backend-deploy.yml instead
   workflow_dispatch:
 
 jobs:

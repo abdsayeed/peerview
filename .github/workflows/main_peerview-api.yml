@@ -1,11 +1,7 @@
-name: Build and deploy Python app to Azure Web App - peerview-api
+name: Build and deploy Python app to Azure Web App - peerview-api (DISABLED)
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'backend/**'
+  # Disabled - not using this app service
   workflow_dispatch:
 
 jobs:
