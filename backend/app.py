@@ -45,6 +45,21 @@ auth_service = AuthService()
 admin_service = AdminService()
 logic_app_service = LogicAppService()
 
+# ROOT ROUTE
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify({
+        'service': 'PeerView API',
+        'version': '1.0',
+        'status': 'running',
+        'endpoints': {
+            'health': '/health',
+            'auth': '/v1/auth/*',
+            'questions': '/v1/questions',
+            'media': '/v1/media/*'
+        }
+    }), 200
+
 # HEALTH CHECK
 @app.route('/health', methods=['GET'])
 def health_check():

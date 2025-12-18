@@ -18,7 +18,7 @@
    ```
 5. Click **Save**
 6. Wait 30-60 seconds for the app to restart
-7. Test: https://peerview-backend-cpeff0b9eqhdanar.switzerlandnorth-01.azurewebsites.net/health
+7. Test: https://peerview-backend.azurewebsites.net/health
 
 ## Verify Configuration
 
@@ -56,4 +56,16 @@ Once running, test these:
 - Questions: `GET /v1/questions`
 
 ## Deployment URL
-https://peerview-backend-cpeff0b9eqhdanar.switzerlandnorth-01.azurewebsites.net
+https://peerview-backend.azurewebsites.net
+
+## Troubleshooting
+
+### Wrong URL?
+If you see a URL like `peerview-backend-cpeff0b9eqhdanar.switzerlandnorth-01.azurewebsites.net`, that's a deployment slot URL.
+
+Your actual production URL is: **https://peerview-backend.azurewebsites.net**
+
+### Check Deployment Slots
+Azure Portal → App Service → Deployment slots
+- You should only see "production"
+- No additional slots needed
