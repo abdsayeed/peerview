@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
 import os
@@ -16,7 +16,7 @@ from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.trace.samplers import ProbabilitySampler
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app, origins=[
     "http://localhost:4200",  # Development
 ])
@@ -514,6 +514,22 @@ def debug_media_urls():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ANGULAR FRONTEND ROUTES
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_angular(path):
+    """Serve Angular frontend for all non-API routes"""
+    # API routes should be handled by their specific endpoints above
+    if path.startswith('v1/') or path.startswith('api/'):
+        return jsonify({'error': 'Not Found'}), 404
+    
+    # Serve static files if they exist
+    if path and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    
+    # Otherwise serve index.html for Angular routing
+    return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == '__main__':
     # For local development
