@@ -45,21 +45,6 @@ auth_service = AuthService()
 admin_service = AdminService()
 logic_app_service = LogicAppService()
 
-# ROOT ROUTE
-@app.route('/', methods=['GET'])
-def root():
-    return jsonify({
-        'service': 'PeerView API',
-        'version': '1.0',
-        'status': 'running',
-        'endpoints': {
-            'health': '/health',
-            'auth': '/v1/auth/*',
-            'questions': '/v1/questions',
-            'media': '/v1/media/*'
-        }
-    }), 200
-
 # HEALTH CHECK
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -515,21 +500,25 @@ def debug_media_urls():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ANGULAR FRONTEND ROUTES
-@app.route('/', defaults={'path': ''})
+# ANGULAR FRONTEND ROUTES (MUST BE LAST)
+@app.route('/')
+def serve_index():
+    """Serve Angular index.html at root"""
+    return app.send_static_file('index.html')
+
 @app.route('/<path:path>')
 def serve_angular(path):
     """Serve Angular frontend for all non-API routes"""
-    # API routes should be handled by their specific endpoints above
-    if path.startswith('v1/') or path.startswith('api/'):
+    # API routes should return 404 if not found
+    if path.startswith('v1/') or path.startswith('api/') or path.startswith('health'):
         return jsonify({'error': 'Not Found'}), 404
     
-    # Serve static files if they exist
-    if path and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    
-    # Otherwise serve index.html for Angular routing
-    return send_from_directory(app.static_folder, 'index.html')
+    # Try to serve static file if it exists (JS, CSS, images)
+    try:
+        return app.send_static_file(path)
+    except:
+        # Otherwise serve index.html for Angular routing
+        return app.send_static_file('index.html')
 
 if __name__ == '__main__':
     # For local development
